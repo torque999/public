@@ -4,7 +4,7 @@
 .DESCRIPTION
     This script is used to create the websites needed for new clients.  It will then bind the client specific certificates.
 .EXAMPLE
-    New-SiteCreation -ID ABCD -Domain site.contoso.com -Pod 1 Example
+    New-SiteCreation -ID ABCD -Domain site.contoso.com -Pod 1 -ServerCount 8
 
     This command will copy the default site framework to the POD1 folder and name it ABCD, build the ABCD site in IIS,
     remove the .aspx handlers and bind the client specific certificate to the newly created site.
@@ -21,28 +21,24 @@ function New-SiteCreation {
     [Alias()]
     param(
         #ID of the client you are updating.
-        [Parameter(Mandatory = $true,
-            ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true)]
         [string]$ID,
 
         #Use fully qualified domain name for this entry
-        [Parameter(Mandatory = $true,
-            ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true)]
         [string]$Domain,
 
         #POD that the client is assigend to.
-        [Parameter(Mandatory = $true,
-            ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true)]
         [Int]$Pod,
 
         #Number of servers in your farm.
-        [Parameter(Mandatory = $true,
-            ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $true)]
         [Int]$ServerCount
     )
     
     Begin {
-        #This is the list of servers in the farm, more can be added if needed.
+        #This is the list of servers in the farm.
         $Base = ($env:COMPUTERNAME).Substring(0, 3)
         $Source = $env:COMPUTERNAME
         $Farm = $ServerCount | ForEach-Object { "$($base)WEB0$_" }
