@@ -41,7 +41,7 @@ function New-SiteCreation {
         #This is the list of servers in the farm.
         $Base = ($env:COMPUTERNAME).Substring(0, 3)
         $Source = $env:COMPUTERNAME
-        $Farm = $ServerCount | ForEach-Object { "$($base)WEB0$_" }
+        $Farm = 1..$ServerCount | ForEach-Object { "$($Base)WEB$($Pod)0$_" }
         #This copies and renames the Framework folder to the FI specific directory.
         foreach ($Server in $Farm) {
             #We are checking to make sure you did your job and installed the certificate in the machine certificate store.
@@ -50,7 +50,7 @@ function New-SiteCreation {
             } -ArgumentList $Domain              
             If ($null -ne $CertTest) {
                 #Copying over the default branding folder for the new sites.    
-                Robocopy.exe "\\$Source\c`$\Default\Framework" "\\$Server\c`$\Branded\POD$Pod\$ID" -e /w:1 /r:5
+                Robocopy.exe "\\$Source\c`$\Default\Framework" "\\$Server\c`$\Branded\$ID" -e /w:1 /r:5
             }
             Else {
                 Throw "Check certificate installaton on $Server."
@@ -66,7 +66,7 @@ function New-SiteCreation {
                     Building out the website, setting SSL and SNI flags, adding the host header, setting the physical path, building
                     and assigning the application pool and removing ASPX handlers.
                     #>
-                New-Website $ID -port 443 -physicalPath C:\Branded\POD$Pod\$ID -Ssl -SslFlags 1 -HostHeader $Domain | Out-Null
+                New-Website $ID -port 443 -physicalPath C:\Branded\$ID -Ssl -SslFlags 1 -HostHeader $Domain | Out-Null
                 New-Item IIS:\AppPools\$ID
                 Set-ItemProperty IIS:\Sites\$ID -Name applicationPool -Value $ID
                 Remove-WebHandler -Name PageHandlerFactory-Integrated -PSPath IIS:\Sites\$ID
